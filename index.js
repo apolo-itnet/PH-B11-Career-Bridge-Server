@@ -31,8 +31,8 @@ async function run() {
 
     app.get('/jobs', async (req, res) => {
       const cursor = jobsCollection.find();
-      const jobs = await cursor.toArray();
-      res.send(jobs);
+      const result = await cursor.toArray();
+      res.send(result);
     });
 
 

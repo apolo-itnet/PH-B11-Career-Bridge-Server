@@ -1,7 +1,6 @@
 {
   "name": "jobs-carrer-server",
   "version": "1.0.0",
-  "description": "",
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
@@ -17,5 +16,14 @@
     "express": "^5.1.0",
     "mongodb": "^6.16.0",
     "nodemon": "^3.1.10"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/apolo-itnet/PH-B11-Career-Bridge-Server.git"
+  },
+  "bugs": {
+    "url": "https://github.com/apolo-itnet/PH-B11-Career-Bridge-Server/issues"
+  },
+  "homepage": "https://github.com/apolo-itnet/PH-B11-Career-Bridge-Server#readme",
+  "description": ""
 }
