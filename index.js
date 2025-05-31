@@ -26,9 +26,10 @@ async function run() {
     // Connect the client to the server	(optional starting in v4.7)
     await client.connect();
 
-    //JOBS API
     const jobsCollection = client.db('careerBridge').collection('jobs');
-
+    const candidateJobsCollection = client.db('careerBridge').collection('candidateJobsApply')
+    
+    //JOBS API
     app.get('/jobs', async (req, res) => {
       const cursor = jobsCollection.find();
       const result = await cursor.toArray();
@@ -41,6 +42,27 @@ async function run() {
       const result = await jobsCollection.findOne(query);
       res.send(result);
     });
+
+
+    // Candidate Jobs Apply API
+
+    app.get('/applications', async (req, res) => {
+      const email = req.query.email;
+
+      const query = {
+      candidate : email
+      }
+      const result = await candidateJobsCollection.find(query).toArray();
+      res.send(result);
+    })
+
+    app.post('/applications', async (req, res) => {
+      const application = req.body;
+      console.log(application);
+      
+      const result = await candidateJobsCollection.insertOne(application);
+      res.send(result);
+    })
 
 
 
