@@ -28,10 +28,16 @@ async function run() {
 
     const jobsCollection = client.db('careerBridge').collection('jobs');
     const candidateJobsCollection = client.db('careerBridge').collection('candidateJobsApply')
-    
+
     //JOBS API
     app.get('/jobs', async (req, res) => {
-      const cursor = jobsCollection.find();
+
+      const email = req.query.email;
+      const query = {};
+      if (email) {
+        query.hr_email = email
+      }
+      const cursor = jobsCollection.find(query);
       const result = await cursor.toArray();
       res.send(result);
     });
@@ -43,6 +49,12 @@ async function run() {
       res.send(result);
     });
 
+    app.post('/jobs', async (req, res) => {
+      const newJob = req.body;
+      const result = await jobsCollection.insertOne(newJob)
+      res.send(result)
+    })
+
 
     // Candidate Jobs Apply API
 
@@ -50,18 +62,51 @@ async function run() {
       const email = req.query.email;
 
       const query = {
-      candidate : email
+        candidate: email
       }
       const result = await candidateJobsCollection.find(query).toArray();
+
+      // bad way to aggregate data
+      for (const application of result) {
+        const jobId = application.jobId;
+        const jobQuery = { _id: new ObjectId(jobId) }
+        const job = await jobsCollection.findOne(jobQuery);
+        application.company_logo = job.company_logo
+        application.company = job.company
+        application.location = job.location
+        application.title = job.title
+        application.category = job.category
+        application.applicationDeadline = job.applicationDeadline
+      }
+
       res.send(result);
+    })
+
+    app.get('/applications/job/:job_id', async (req, res) => {
+      const job_id = req.params.job_id;
+      const query = { jobId: job_id }
+      const result = await candidateJobsCollection.find(query).toArray();
+      res.send(result)
     })
 
     app.post('/applications', async (req, res) => {
       const application = req.body;
       console.log(application);
-      
+
       const result = await candidateJobsCollection.insertOne(application);
       res.send(result);
+    })
+
+    app.patch('/applications/:id', async (req, res) => {
+      const id = req.params.id;
+      const filter = { _id: new ObjectId(id) }
+      const updateDoc = {
+        $set: {
+          status: req.body.status
+        }
+      }
+      const result = await candidateJobsCollection.updateOne(filter, updateDoc)
+      res.send(result)
     })
 
 
