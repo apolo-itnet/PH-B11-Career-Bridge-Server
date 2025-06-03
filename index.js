@@ -26,8 +26,31 @@ async function run() {
     // Connect the client to the server	(optional starting in v4.7)
     await client.connect();
 
+    const usersCollection = client.db('careerBridge').collection('users')
     const jobsCollection = client.db('careerBridge').collection('jobs');
     const candidateJobsCollection = client.db('careerBridge').collection('candidateJobsApply')
+
+    //USER API
+
+    app.get('/users', async (req, res) => {
+      const result = await usersCollection.find().toArray()
+      res.send(result)
+    })
+
+    // Create user in MongoDB
+    app.post('/users', async (req, res) => {
+      const user = req.body;
+
+      // Check if user already exists
+      const existing = await usersCollection.findOne({ email: user.email });
+      if (existing) {
+        return res.status(409).send({ message: 'User already exists' });
+      }
+
+      const result = await usersCollection.insertOne(user);
+      res.send(result);
+    });
+
 
     //JOBS API
     app.get('/jobs', async (req, res) => {
